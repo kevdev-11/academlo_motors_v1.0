@@ -1,9 +1,11 @@
-
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../../config/database/database.js';
-// import format from 'date-fns';
+import dayjs from 'dayjs';
 
-const MotorcyclesInRepair = sequelize.define('motorcycles', {
+// import format from 'date-fns';
+// import date from '../motorcycles/middlewares/format-fns.middleware.js'
+
+const MotorcyclesInRepair = sequelize.define('repairs', {
 
   id: {
     primaryKey: true,
@@ -11,19 +13,15 @@ const MotorcyclesInRepair = sequelize.define('motorcycles', {
     allowNull: false,
     type: DataTypes.INTEGER
   },
-  // date: {
-  //   type: DataTypes.DATEONLY,
-  //   allowNull: false,
-  //   get() {
-  //     return format(this.getDataValue('date'), 'dd-MM-yyyy');
-  //   },
-  //   set(date) {
-  //     this.setDataValue('date', date);
-  //   }
-  // },
   date: {
     type: DataTypes.STRING,
-    allowNull:false
+    allowNull: false,
+    get(){
+      return dayjs(this.getDataValue('date'), 'DD-MM-YYYY').format('DD-MM-YYYY');
+    },
+    set(dateValue){
+      return this.setDataValue('date', dateValue? dayjs(dateValue).format('DD-MM-YYYY') : null)
+    }
   },
   motorsNumber:{
     type: DataTypes.STRING(30),
@@ -43,6 +41,16 @@ const MotorcyclesInRepair = sequelize.define('motorcycles', {
     field: 'user_id',
     allowNull: false,
   }
+},{
+  // hooks:{
+  //   beforeCreate: (record, options) => {
+  //     record.dataValues.date = new Date().toLocaleString()
+  //   },
+  //   beforeUpdate: (record, options) => {
+  //     record.dataValues.date = new Date.toLocaleString()
+  //   }
+  // },
+
 });
 
 export default MotorcyclesInRepair;

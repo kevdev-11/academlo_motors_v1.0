@@ -42,7 +42,7 @@ export const globalErrorHandler = (err, req, res, next) => {
         })
     }
     if(config.NODE_ENV === 'production'){
-        let error = {...err};
+        let error = {err};
         if(err.parent.code === '23505'){
             error = Error23505()
         }

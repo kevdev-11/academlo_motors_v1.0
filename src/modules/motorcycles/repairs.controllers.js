@@ -40,12 +40,9 @@ export const create = catchAsync(async (req, res, next) => {
                 status: 'error',
                 message: errorMessages
             })
-        }
+        };
 
-        // const { date, userId, motorsNumber } = req.body;
-
-        // const parseDate = parse(date, 'dd-MM-yyyy', new Date().toLocaleDateString);
-        const newAppointment = await RepairService.createAppointment(motorsData);
+    const newAppointment = await RepairService.createAppointment(motorsData);
 
         return res.status(200).json(
             {
@@ -84,7 +81,7 @@ export const cancel = catchAsync(async (req, res, next) => {
             { status: "cancelled" }
         )
         // verificando si el status es completed, enviando el error:
-        if (!repair.status) {
+        if (!repair) {
             return res.status(404).json(
                 {
                     message: 'not resgistered as pending'   

@@ -4,8 +4,8 @@ import { extractValidation } from '../../common/utils/extractErrorsData.js';
 const repairSchema = z.object(
     
     {
-        date: z
-        .string(),
+        date: z.string(),
+
         motorsNumber: z
         .string()
         .min(5, {message: 'Must be more than five characters alphanumeric'})
@@ -13,7 +13,9 @@ const repairSchema = z.object(
         description: z
         .string()
         .min(3, { message: 'text is too short' })
-        .max(50, { message: 'text is too long' })
+        .max(50, { message: 'text is too long' }),
+        userId: z
+        .number()
     }
 );
 
