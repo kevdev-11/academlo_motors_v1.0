@@ -1,3 +1,4 @@
+import UsersOrStaff from "../users/staff.models.js";
 import  MotorcyclesInRepair  from "./repairs.models.js";
 
 
@@ -8,7 +9,12 @@ export class RepairService {
             return await MotorcyclesInRepair.findAll({
                 where: {
                     status: 'pending'
-                }
+                },
+                include: [
+                    {
+                        model: UsersOrStaff
+                    }
+                ]
             });
         } catch (error) {
             console.log(error);

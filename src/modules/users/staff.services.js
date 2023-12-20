@@ -11,23 +11,18 @@ export class UserServices {
         }
     }
     static async findOne(id){
-        try {
             return await UsersOrStaff.findOne({
                 where: {
-                    id: id,
+                    id,
+                    status: 'available'
                 }
             });
-        } catch (error) {
-            console.log(error);
-        }
     }
+
     static async create(data){
-        try {
             return await UsersOrStaff.create(data);
-        } catch (error) {
-            console.log(error);
-        }
     }
+
     static async update(user, data){
         try {
             return await user.update(data);

@@ -20,7 +20,10 @@ const findAllUsers = catchAsync(async(req, res, next) => {
 const findOneUser = catchAsync(async(req, res, next) => { 
   
         const { user } = req;
-
+        console.log(user)
+        if(!user || user.status === 'disabled'){
+            return next(new AppErrors('this account does not exist', 404))
+        }
         // console.log(req.sessionUser)
 
         return res.status(200).json({
@@ -51,7 +54,6 @@ const register = catchAsync(async(req, res, next) => { // post
             user: {
             id: user.id,
             name: user.name,
-            password: user.password,
             email: user.email,
             role: user.role,
             status: user.status
@@ -85,8 +87,12 @@ const login = catchAsync(async(req, res, next) => {
     }
     
     const token = await generateJWT(user.id);
-    
-    return await res.status(200).json({
+
+    if(!token){
+        return next(new AppErrors('this token is unable', 404))
+    }
+
+    return res.status(200).json({
         token,
         user: {
             id: user.id,
@@ -99,21 +105,28 @@ const login = catchAsync(async(req, res, next) => {
 
 const updateUser = catchAsync(async(req, res, next) => { // put
 
-        const {user} = req;
-        const {hasError, userData, errorMessages} = validatePartialData(req.body);
+    const {hasError, userData, errorMessages} = validatePartialData(req.body);
+
+    if (hasError) {
+        return res.status(422).json({
+            status: 'error',
+            message: 'Invalid data',
+            errors: errorMessages
+        })
+    }
+    const {user, sessionUser} = req;
         
-        if (hasError) {
-            return res.status(422).json({
-                status: 'error',
-                message: 'Invalid data',
-                errors: errorMessages
-            })
+        if(!user){
+            return next(new AppErrors('this account does not exist', 404))
         }
 
-        const userUpdated = await UserServices.update(user, userData);
+        const userUpdated = await user.update(userData, {
+            name: user.name,
+            email: user.email
+        });
 
         return res.status(200).json({
-            req: req.body,
+            sessionUser,
             message: 'updated users is right!',
             userUpdated
         });
@@ -132,16 +145,15 @@ const disableUser = catchAsync(async(req, res, next) => { // delete
 
 });
 
-const passwordChanged = catchAsync(async(req, res, next)=> {
+const passwordChanged = catchAsync(async(req, res, next)=> { // pendiente por revisar
 
-    
-    const {sessionUser} = req;
+    const { sessionUser } = req;
     
     const { currentPassword, newPassword } = validateLoginData(req.body);
     
     if(currentPassword === newPassword){
-        return next(new AppErrors('the passwords cannot be equal', 400))
-    }
+        return next(new AppErrors('the passwords cannot be equal', 401))
+    }   
     
     const isCorrectPassword = await verifyPassword(currentPassword, sessionUser.password);
 
@@ -151,13 +163,15 @@ const passwordChanged = catchAsync(async(req, res, next)=> {
     
     const hashedNewPassword = await encryptedPassword(newPassword);
     
-    await UserServices.update(sessionUser, {
+    const restPass = await UserServices.update(sessionUser, {
         password: hashedNewPassword,
-        passwordAt: new Date()
-    })
-    
+    });
+
+    console.log(restPass);
+
     return res.status(300).json({
         message:'The user password was updated',
+        restPass,
         sessionUser
     })
 

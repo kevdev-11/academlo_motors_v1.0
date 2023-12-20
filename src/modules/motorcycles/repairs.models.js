@@ -2,9 +2,6 @@ import { DataTypes } from 'sequelize';
 import { sequelize } from '../../config/database/database.js';
 import dayjs from 'dayjs';
 
-// import format from 'date-fns';
-// import date from '../motorcycles/middlewares/format-fns.middleware.js'
-
 const MotorcyclesInRepair = sequelize.define('repairs', {
 
   id: {
@@ -14,17 +11,14 @@ const MotorcyclesInRepair = sequelize.define('repairs', {
     type: DataTypes.INTEGER
   },
   date: {
-    type: DataTypes.STRING,
     allowNull: false,
     get(){
       return dayjs(this.getDataValue('date'), 'DD-MM-YYYY').format('DD-MM-YYYY');
     },
-    set(dateValue){
-      return this.setDataValue('date', dateValue? dayjs(dateValue).format('DD-MM-YYYY') : null)
-    }
+    type: DataTypes.STRING,
   },
   motorsNumber:{
-    type: DataTypes.STRING(30),
+    type: DataTypes.STRING(20),
     allowNull: false
   },
   description:{
@@ -40,17 +34,7 @@ const MotorcyclesInRepair = sequelize.define('repairs', {
     type: DataTypes.INTEGER,
     field: 'user_id',
     allowNull: false,
-  }
-},{
-  // hooks:{
-  //   beforeCreate: (record, options) => {
-  //     record.dataValues.date = new Date().toLocaleString()
-  //   },
-  //   beforeUpdate: (record, options) => {
-  //     record.dataValues.date = new Date.toLocaleString()
-  //   }
-  // },
-
+  },
 });
 
 export default MotorcyclesInRepair;
